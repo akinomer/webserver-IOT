@@ -1,0 +1,326 @@
+<html>
+    <head>
+        <title>Wireless Serial Communication</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- bootstrap 5 cdn -->
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <style>
+            .svg-loader{
+                display:flex;
+                position: relative;
+                align-content: space-around;
+                justify-content: center;
+            }
+            .loader-svg{
+                position: absolute;
+                left: 0; right: 0; top: 0; bottom: 0;
+                fill: none;
+                stroke-width: 5px;
+                stroke-linecap: round;
+                stroke: #0d6efd;
+            }
+            .loader-svg.bg{
+                stroke-width: 8px;
+                stroke: #bfd3f1;
+            }
+            .animate{
+                stroke-dasharray: 242.6;
+                animation: fill-animation 1s cubic-bezier(1,1,1,1) 0s infinite;
+            }
+
+            @keyframes fill-animation{
+                0%{
+                    stroke-dasharray: 40 242.6;
+                    stroke-dashoffset: 0;
+                }
+                50%{
+                    stroke-dasharray: 141.3;
+                    stroke-dashoffset: 141.3;
+                }
+                100%{
+                    stroke-dasharray: 40 242.6;
+                    stroke-dashoffset: 282.6;
+                }
+            }
+
+            .networks{
+                overflow-y: scroll;
+                overflow-x: hidden;
+            }
+
+            .card-title{
+                font-size: 1.5rem;
+                font-weight: bold;
+            }
+            
+            #forgetNetwork{
+                padding: 0.175rem 0.75rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-12 mt-2">
+                    <img src="data:image/png;base64,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" class="img-fluid" alt="Wireless Serial Communication">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 mt-1">
+                    <h5>Wireless Serial Communication</h5>
+                </div>
+            </div>
+            <div class="row" style="display: none;">
+                <div class="col-12">
+                    <button class="btn btn-primary form-control btn-sm" id="scan-network">
+                        <svg  width="25"  version="1.1" viewBox="0 0 147.59 147.59" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+                            <g fill="#FFF">
+                                <path d="m48.712 94.208c-2.929 2.929-2.929 7.678 0 10.606 2.93 2.929 7.678 2.929 10.607 0 7.98-7.98 20.967-7.98 28.947 0 1.465 1.464 3.385 2.197 5.304 2.197s3.839-0.732 5.304-2.197c2.929-2.929 2.929-7.678 0-10.606-13.83-13.83-36.332-13.83-50.162 0z"/>
+                                <path d="m26.73 72.225c-2.929 2.929-2.929 7.678 0 10.606s7.677 2.93 10.607 0c20.102-20.102 52.811-20.102 72.912 0 1.465 1.464 3.385 2.197 5.304 2.197s3.839-0.732 5.304-2.197c2.929-2.929 2.929-7.678 0-10.606-25.951-25.95-68.176-25.95-94.127 0z"/>
+                                <path d="m145.39 47.692c-39.479-39.479-103.72-39.479-143.19 0-2.929 2.929-2.929 7.678 0 10.606 2.93 2.929 7.678 2.929 10.607 0 16.29-16.291 37.95-25.262 60.989-25.262s44.699 8.972 60.989 25.262c1.465 1.464 3.385 2.197 5.304 2.197s3.839-0.732 5.304-2.197c2.929-2.928 2.929-7.677 0-10.606z"/>
+                                <circle cx="73.793" cy="121.27" r="8.231"/>
+                            </g>
+                        </svg> 
+                         Scan Network
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mt-1">
+                    <div id="result">
+                        <div class="svg-loader" style="display: none;">
+                            <svg class="svg-container" height="100" width="100" viewBox="0 0 100 100">
+                              <circle class="loader-svg bg" cx="50" cy="50" r="45"></circle>
+                              <circle class="loader-svg animate" cx="50" cy="50" r="45"></circle>
+                            </svg>
+                        </div>
+                        <div class="networks"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div id="wifiInfo">
+                    <div class="card" style="width: 100%;">
+                        <div class="card-header">
+                            <span class="card-title">WiFi Info</span>
+                            <button id="forgetNetwork" class="btn btn-dark btn float-right">Disconnect</button>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                          <li class="list-group-item"><b>WiFi SSID:</b> <span id="ssid"></span></li>
+                          <li class="list-group-item"><b>WiFi Strength:</b> <span id="rssi"></span></li>
+                          <li class="list-group-item"><b>IP Address:</b> <span id="ipaddr"></span></li>
+                          
+                        </ul>
+                        <div class="card-footer">
+                            <input type="text" class="form-control mt-1" id="serialinput" placeholder="Input serial data">
+                            <button id="sendSerial" class="btn btn-primary btn-sm form-control mt-2 mb-1">Send TX</button>
+                        </div>
+                    </div>
+                    <div class="card mt-1" style="width: 100%;">
+                        <div class="card-header">
+                            <span class="serial-title">Incoming Serial Data</span>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                          <li class="list-group-item"><b>RX:</b> <span id="rx"></span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="position:absolute; bottom:0;">
+                <div class="col-12 mt-3">
+                    <p>
+                        <b>Mobil:</b> +90 (546) 667 48 68<br>
+                        www.argesan.net / info@argesan.net
+                    </p>
+                </div>
+            </div>
+        </div>
+        <script>
+            $(document).ready(function(){
+
+                
+
+
+
+
+                $('#sendSerial').click(function(){
+                    var data = $('#serialinput').val();
+                    $.ajax({
+                        url: 'sendSerial',
+                        type: 'POST',
+                        data: {data: data},
+                        success: function(response){
+                            console.log(response);
+                        }
+                    });
+                });
+                
+                $.ajax({
+                    url: 'wifistatus',
+                    type: 'GET',
+                    success: function(data){
+                        if(data==0){
+                            $('.networks').show();
+                            $(".row:eq(2)").show();
+                            $(".row:eq(3)").hide();
+                            $(".row:eq(4)").hide();
+                        }else{
+                            $('.networks').hide();
+                            $(".row:eq(2)").hide();
+                            $(".row:eq(3)").hide();
+                            $(".row:eq(4)").show();
+
+                            
+
+                        }
+                    }
+                });
+
+                setTimeout(function(){
+                    $.ajax({
+                        url: 'wifiinfo',
+                        type: 'GET',
+                        success: function(data){
+                            $('#ssid').html(data.ssid);
+                            $('#rssi').html(data.rssi);
+                            $('#ipaddr').html(data.ipaddr);
+                            
+                            var wsip = $('#ipaddr').html();
+
+                            var ws = new WebSocket("ws://"+wsip+"/ws");
+
+                            ws.onopen = function(evt){
+                                console.log("Connected to websocket");
+                            };
+
+                            ws.onmessage = function(evt) {
+                                $('#rx').html("Rastgele Numaralar: " + evt.data + " ");
+                            };
+                        }
+                    });
+                }, 500);
+
+                var waitIcon = `
+                    <svg class="svg-container" height="20" width="20" viewBox="0 0 100 100">
+                              <circle class="loader-svg bg" cx="50" cy="50" r="45"></circle>
+                              <circle class="loader-svg animate" cx="50" cy="50" r="45"></circle>
+                            </svg>
+                `;
+
+                $('#connectTo').click(function(){
+                    var ssid = $('#ssid').val();
+                    var pass = $('#pass').val();
+                    var devicename = $('#devicename').val();
+
+                    if(pass==""){
+                        alert("Please enter password");
+                    }else{
+                        $('#connectionStatus').html(waitIcon+' Please wait...');
+                        $.post("connectTo", {ssid: ssid, pass: pass, devicename: devicename}, function(result){
+                            $('#connectionStatus').html(result);
+                        });
+                    }
+                    
+                });
+
+                $('#forgetNetwork').click(function(){
+                    $.ajax({
+                        url: 'forgetNetwork',
+                        type: 'GET',
+                        success: function(data){
+                            if(data=="1"){
+                                alert('You are disconnected from current network. You can reconnect to device again.');
+                            }
+                        }
+                    });
+                });
+
+
+                var connectIcon = `
+                <svg width='20' fill='white' enable-background="new 0 0 297 297" version="1.1" viewBox="0 0 297 297" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+                    <path d="m286.94 155.78h-27.718c1.93-1.828 3.139-4.408 3.139-7.275v-0.502c0-5.54-4.492-10.031-10.032-10.031s-10.032 4.491-10.032 10.031v0.502c0 2.867 1.209 5.447 3.138 7.275h-96.937c-5.54 0-10.032 4.492-10.032 10.032v62.338c-1.828-1.928-4.407-3.137-7.273-3.137h-0.501c-5.54 0-10.032 4.492-10.032 10.032s4.492 10.032 10.032 10.032h0.501c2.866 0 5.445-1.209 7.273-3.136v45.03c0 5.54 4.492 10.032 10.032 10.032h138.44c5.54 0 10.032-4.492 10.032-10.032v-121.16c1e-3 -5.538-4.492-10.031-10.032-10.031zm-10.032 20.065v66.48h-118.38v-66.48h118.38zm-118.38 101.1v-14.551h118.38v14.551h-118.38z"/>
+                    <path d="m194.15 71.991h0.995c5.54 0 10.032-4.492 10.032-10.032s-4.492-10.032-10.032-10.032h-0.995c-5.54 0-10.031 4.492-10.031 10.032s4.491 10.032 10.031 10.032z"/>
+                    <path d="m222.99 71.991h0.994c5.54 0 10.032-4.492 10.032-10.032s-4.492-10.032-10.032-10.032h-0.994c-5.54 0-10.032 4.492-10.032 10.032s4.492 10.032 10.032 10.032z"/>
+                    <path d="m252.33 72.492c5.54 0 10.032-4.491 10.032-10.032v-0.501c0-5.54-4.492-10.032-10.032-10.032h-0.502c-5.54 0-10.032 4.492-10.032 10.032 0 2.897 1.229 5.509 3.194 7.34 1.831 1.965 4.442 3.193 7.34 3.193z"/>
+                    <path d="m262.36 90.311c0-5.541-4.492-10.032-10.032-10.032s-10.032 4.491-10.032 10.032v0.994c0 5.54 4.492 10.032 10.032 10.032s10.032-4.492 10.032-10.032v-0.994z"/>
+                    <path d="m252.33 109.12c-5.54 0-10.032 4.492-10.032 10.032v0.994c0 5.54 4.492 10.032 10.032 10.032s10.032-4.492 10.032-10.032v-0.994c0-5.54-4.492-10.032-10.032-10.032z"/>
+                    <path d="m102.85 225.01h-0.995c-5.54 0-10.031 4.492-10.031 10.032s4.491 10.032 10.031 10.032h0.995c5.54 0 10.032-4.492 10.032-10.032s-4.492-10.032-10.032-10.032z"/>
+                    <path d="m74.011 225.01h-0.994c-5.54 0-10.032 4.492-10.032 10.032s4.492 10.032 10.032 10.032h0.994c5.54 0 10.032-4.492 10.032-10.032s-4.492-10.032-10.032-10.032z"/>
+                    <path d="m44.671 224.51c-5.54 0-10.032 4.491-10.032 10.032v0.501c0 5.54 4.492 10.032 10.032 10.032h0.502c5.54 0 10.032-4.492 10.032-10.032 0-2.897-1.229-5.509-3.194-7.34-1.831-1.965-4.442-3.193-7.34-3.193z"/>
+                    <path d="m54.703 176.85c0-5.54-4.492-10.032-10.032-10.032s-10.032 4.492-10.032 10.032v0.994c0 5.54 4.492 10.032 10.032 10.032s10.032-4.492 10.032-10.032v-0.994z"/>
+                    <path d="m44.671 195.66c-5.54 0-10.032 4.492-10.032 10.032v0.994c0 5.541 4.492 10.032 10.032 10.032s10.032-4.491 10.032-10.032v-0.994c0-5.54-4.492-10.032-10.032-10.032z"/>
+                    <path d="m34.639 148.5v0.502c0 5.54 4.492 10.031 10.032 10.031s10.032-4.491 10.032-10.031v-0.502c0-2.867-1.209-5.447-3.138-7.275h96.935c5.54 0 10.032-4.492 10.032-10.032v-62.339c1.828 1.928 4.407 3.137 7.273 3.137h0.501c5.54 0 10.032-4.492 10.032-10.032s-4.492-10.032-10.032-10.032h-0.501c-2.866 0-5.445 1.209-7.273 3.136v-45.03c0-5.541-4.492-10.033-10.032-10.033h-138.44c-5.54 0-10.033 4.492-10.033 10.032v121.16c0 5.54 4.492 10.032 10.032 10.032h27.72c-1.929 1.829-3.138 4.409-3.138 7.276zm103.83-128.44v66.479h-118.38v-66.479h118.38zm-118.38 86.543h118.38v14.552h-118.38v-14.552z"/>
+                </svg>
+                `;
+
+                $("#scan-network").click(function(){
+                    $(".row:eq(3)").show();
+                    $(".networks").html('');
+                    $(".svg-loader").show();
+                    var interval = setInterval(function(){ 
+                        $.ajax({
+                            url: "wifiscan",
+                            type: "GET",
+                            success: function(data){
+                                
+                                $(".networks").css('height', window.innerHeight - 290);
+                                var cisin = data;
+                                if(cisin.length > 0){
+                                    clearInterval(interval);
+                                    $(".svg-loader").hide();
+                                    var html = "<div class='row mb-1 mt-2'><div class='col-md-12 text-right'><b>"+cisin.length+" networks found</b></div></div>";
+                                    for(var i=0; i<cisin.length; i++){
+                                        html += "<div class='row mb-1' id='ssid-"+i+"'><div class='col-md-12'><div class='card'><div class='card-body'><h5 class='card-title'>"+cisin[i].ssid+"</h5><p class='card-text'>Signal Quality: "+cisin[i].quality+"</p><button class='btn btn-info btn-sm' id='connectBtn-"+i+"' style='float:right;'>"+connectIcon+" Connect</button></div></div></div></div>";
+                                    }
+                                    $(".networks").html(html);
+                                }
+                                
+                            }
+                        });
+                    }, 3000);
+                });
+
+                //get id like click connect button
+                $(document).on('click', '.btn-info', function(){
+                    var id = $(this).attr('id').split('-')[1];
+                    //get ssid of clicked network
+                    var ssid = $("#ssid-"+id).find('.card-title').text();
+                    console.log(ssid);
+                    $('.modal-title').html("<b>Network:</b> "+ssid);
+                    $('#ssid').val(ssid);
+                    $('#myModal').modal('show');
+                    $('#connectTo').html(connectIcon+' Connect')
+                });
+
+
+            });
+        </script>
+
+        <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="ssid">
+                    <p><input class="form-control" type="text" placeholder="Input network password" id="pass"></p>
+                    <p><input class="form-control" type="text" placeholder="Define device name (optional) e.g. mydevice1" id="devicename"></p>
+                    <p><button type="button" id="connectTo" class="btn btn-primary form-control">Connect</button></p>
+                    <p id='connectionStatus'></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm float-left" data-bs-dismiss="modal">Close</button>
+                    
+                </div>
+            </div>
+            </div>
+        </div>
+
+
+        
+    </body>
+</html>
